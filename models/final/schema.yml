@@ -1,0 +1,78 @@
+version: 2
+
+models:
+  - name: policy_lifecycle_enriched
+    description: "Enriched view of policy events with lifecycle timestamps and status"
+    columns:
+      - name: policy_id
+        description: "Unique identifier for each policy"
+        tests:
+          - not_null 
+      - name: last_event_type
+        description: "Type of event in the policy lifecycle [quote, bind, cancel]"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['quote', 'bind', 'cancel']
+              
+      - name: event_ts
+        description: "Timestamp when the event occurred"
+        tests:
+          - not_null
+      
+      - name: dim_state
+        description: "Dimension table for US states referenced in policy events."
+        columns:
+          - name: state
+            description: "State or territory abbreviation (e.g., 'VIC', 'NSW')."
+      - name: dim_product_type
+        description: "Dimension table for product types used in policies."
+        columns:
+          - name: product_type
+            description: "Product type such as 'contents', 'home', or 'life'."
+      - name: dim_source_channel
+        description: "Dimension table listing all unique source channels from which policy events originated."
+        columns:
+          - name: source_channel
+            description: "Channel indicating the origin of the event (e.g., 'online', 'agent', 'call_center')."
+      - name: dim_event_type
+        description: "Dimension table listing all unique event types recorded for insurance policies."
+        columns:
+          - name: last_event_type
+            description: "Type of policy event, such as 'quote', 'bind', or 'cancel'."
+      
+      - name: first_quote_ts
+        description: "Timestamp of the first quote event"
+        tests:
+          - not_null
+
+      - name: first_bind_ts
+        description: "Timestamp of the first bind event"
+
+      - name: current_status
+        description: "Latest status based on event history"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['quoted', 'bound', 'cancelled']
+
+      - name: quote_to_bind_mins
+        description: "Time taken from quote to bind in minutes"
+
+      - name: bind_to_cancel_mins
+        description: "Time taken from bind to cancel in minutes"
+
+      - name: event_month
+        description: "Month name when first event occurred"
+        tests:
+          - not_null
+          
+  - name: quoted_never_bound_analysis
+    description: "Counts the number of policies quoted but never bound"
+
+  - name: cancelled_within_30_days_analysis
+    description: "Count of policies cancelled within 30 days of binding"
+
+  - name: avg_quote_to_bind_by_month_analysis
+    description: "Average quote-to-bind duration grouped by event month"
+

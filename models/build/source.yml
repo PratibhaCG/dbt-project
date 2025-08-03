@@ -1,0 +1,35 @@
+version: 2
+
+sources:
+  - name: policy_events
+    description: External policy events table in BigQuery
+    database: horizontal-ray-467611-f9
+    schema: single_view_policy_assignment
+    tables:
+      - name: policy_events_external_table
+        description: External table over policy events CSV data
+        columns:
+          - name: policy_id
+            description: Unique identifier for the policy
+            tests:
+              - dbt_expectations.expect_column_values_to_not_be_null
+          - name: event_type
+            description: Type of event
+            tests:
+              - dbt_expectations.expect_column_values_to_not_be_null
+              - dbt_expectations.expect_column_values_to_be_in_set:
+                  value_set: ['quote', 'bind', 'cancel']
+          - name: event_timestamp
+            description: Timestamp of the event
+            tests:
+              - dbt_expectations.expect_column_values_to_not_be_null
+          - name: source_channel
+            description: Source of the event
+          - name: state
+            description: State associated with the event
+          - name: product_type
+            description: Product type
+          - name: premium_amount
+            description: Premium amount (string in source)
+
+
